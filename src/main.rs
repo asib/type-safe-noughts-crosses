@@ -9,7 +9,6 @@ mod game;
 #[function_component(App)]
 fn app() -> Html {
     let game_state = use_state(|| Either::Left(game::State::default()));
-    let game_state2 = game_state.clone();
     let error = use_state(|| None);
 
     let on_click = {
@@ -17,26 +16,16 @@ fn app() -> Html {
         let error = error.clone();
 
         Callback::from(move |(row, col)| {
-            match *game_state {
-                Left(left) => match left.next((row, col)) {
-                    Ok(s) => {
-                        game_state.set(Right(s));
-                    }
-                    Err(err) => error.set(Some(format!("{err:?}"))),
-                },
-                Right(right) => match right.next((row, col)) {
-                    Ok(s) => {
-                        game_state.set(Left(s));
-                    }
-                    Err(err) => error.set(Some(format!("{err:?}"))),
-                },
-            };
+            for_both!(game_state.as_ref(), state => match state.next((row, col)) {
+                Ok(s) => game_state.set(s.into()),
+                Err(err) => error.set(Some(format!("{err:?}"))),
+            })
         })
     };
 
     html! {
         <>
-            <Board board={for_both!(game_state2.as_ref(), s => s.board.clone())} on_click={on_click} />
+            <Board board={for_both!(game_state.as_ref(), s => s.board.clone())} on_click={on_click} />
         </>
     }
 }

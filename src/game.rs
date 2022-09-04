@@ -1,3 +1,4 @@
+use either::{Either, Left, Right};
 use std::marker::PhantomData;
 use tyrade::*;
 
@@ -21,6 +22,19 @@ tyrade! {
         }
     }
 }
+
+impl Clone for PlayerO {
+    fn clone(&self) -> Self {
+        PlayerO(PhantomData)
+    }
+}
+impl Copy for PlayerO {}
+impl Clone for PlayerX {
+    fn clone(&self) -> Self {
+        PlayerX(PhantomData)
+    }
+}
+impl Copy for PlayerX {}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Player {
@@ -55,18 +69,17 @@ pub struct State<Player> {
     _player_marker: PhantomData<Player>,
 }
 
-impl Clone for PlayerO {
-    fn clone(&self) -> Self {
-        PlayerO(PhantomData)
+impl Into<Either<State<PlayerO>, State<PlayerX>>> for State<PlayerX> {
+    fn into(self) -> Either<State<PlayerO>, State<PlayerX>> {
+        Right(self)
     }
 }
-impl Copy for PlayerO {}
-impl Clone for PlayerX {
-    fn clone(&self) -> Self {
-        PlayerX(PhantomData)
+
+impl Into<Either<State<PlayerO>, State<PlayerX>>> for State<PlayerO> {
+    fn into(self) -> Either<State<PlayerO>, State<PlayerX>> {
+        Left(self)
     }
 }
-impl Copy for PlayerX {}
 
 impl Default for State<PlayerO> {
     fn default() -> Self {
