@@ -2,12 +2,13 @@ use either::{for_both, Either, Left, Right};
 use std::marker::PhantomData;
 use tyrade::*;
 
+pub type Result<T> = std::result::Result<T, GameError>;
+
 #[derive(Debug)]
 pub enum GameError {
     SpotTaken,
+    Winner(Player),
 }
-
-pub type Result<T> = std::result::Result<T, GameError>;
 
 tyrade! {
     enum TPlayer {
@@ -96,10 +97,16 @@ pub fn board(state: &GameState) -> Board {
 
 impl<Player: ComputeTNextPlayer + Spotted> State<Player> {
     pub fn next(self, pos: (usize, usize)) -> Result<State<TNextPlayer<Player>>> {
-        Ok(State::<TNextPlayer<Player>> {
+        let next_state = State::<TNextPlayer<Player>> {
             board: update_board::<Player>(self.board, pos)?,
             _player_marker: PhantomData,
-        })
+        };
+
+        if let Some(winner) = check_winner(&next_state.board) {
+            return Err(GameError::Winner(winner));
+        }
+
+        Ok(next_state)
     }
 }
 
