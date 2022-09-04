@@ -1,0 +1,14 @@
+[package]
+name = "rust-countdown"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+generic_associated_types = []
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+yew = "0.19"
+tyrade = { git = "https://github.com/willcrichton/tyrade" }
+either = "1.8.0"
