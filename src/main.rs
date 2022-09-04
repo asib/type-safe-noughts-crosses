@@ -8,7 +8,7 @@ mod game;
 
 #[function_component(App)]
 fn app() -> Html {
-    let game_state = use_state(|| Either::Left(game::State::default()));
+    let game_state = use_state(|| game::new_game());
     let error = use_state(|| None);
 
     let on_click = {
@@ -25,7 +25,7 @@ fn app() -> Html {
 
     html! {
         <>
-            <Board board={for_both!(game_state.as_ref(), s => s.board.clone())} on_click={on_click} />
+            <Board board={game::board(&game_state)} on_click={on_click} />
         </>
     }
 }

@@ -1,4 +1,4 @@
-use either::{Either, Left, Right};
+use either::{for_both, Either, Left, Right};
 use std::marker::PhantomData;
 use tyrade::*;
 
@@ -81,13 +81,17 @@ impl Into<Either<State<PlayerO>, State<PlayerX>>> for State<PlayerO> {
     }
 }
 
-impl Default for State<PlayerO> {
-    fn default() -> Self {
-        State::<PlayerO> {
-            board: [[Spot::Empty; 3]; 3],
-            _player_marker: PhantomData,
-        }
-    }
+type GameState = Either<State<PlayerO>, State<PlayerX>>;
+
+pub fn new_game() -> GameState {
+    Left(State::<PlayerO> {
+        board: [[Spot::Empty; 3]; 3],
+        _player_marker: PhantomData,
+    })
+}
+
+pub fn board(state: &GameState) -> Board {
+    for_both!(state, s => s.board.clone())
 }
 
 impl<Player: ComputeTNextPlayer + Spotted> State<Player> {
