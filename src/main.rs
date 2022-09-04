@@ -16,6 +16,7 @@ fn app() -> Html {
         let error = error.clone();
 
         Callback::from(move |(row, col)| {
+            error.set(None);
             for_both!(game_state.as_ref(), state => match state.next((row, col)) {
                 Ok(s) => game_state.set(s.into()),
                 Err(err) => error.set(Some(format!("{err:?}"))),
@@ -26,6 +27,9 @@ fn app() -> Html {
     html! {
         <>
             <Board board={game::board(&game_state)} on_click={on_click} />
+            if let Some(err) = error.as_ref() {
+                <p>{err}</p>
+            }
         </>
     }
 }
@@ -77,7 +81,7 @@ struct SpotProps {
 fn spot(SpotProps { spot, on_click }: &SpotProps) -> Html {
     let on_click = on_click.clone();
     html! {
-        <div onclick={move |_| on_click.emit(())} class="m-2 border w-25 h-100 border-primary">{ match spot {
+        <div onclick={move |_| on_click.emit(())} class="m-2 p-4 text-center border border-primary">{ match spot {
             game::Spot::Player(p) => format!("{p:?}"),
             game::Spot::Empty => "".into()
         } }</div>
