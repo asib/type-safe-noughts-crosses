@@ -69,19 +69,19 @@ pub struct State<Player> {
     _player_marker: PhantomData<Player>,
 }
 
-impl Into<Either<State<PlayerO>, State<PlayerX>>> for State<PlayerX> {
-    fn into(self) -> Either<State<PlayerO>, State<PlayerX>> {
+type GameState = Either<State<PlayerO>, State<PlayerX>>;
+
+impl Into<GameState> for State<PlayerX> {
+    fn into(self) -> GameState {
         Right(self)
     }
 }
 
-impl Into<Either<State<PlayerO>, State<PlayerX>>> for State<PlayerO> {
-    fn into(self) -> Either<State<PlayerO>, State<PlayerX>> {
+impl Into<GameState> for State<PlayerO> {
+    fn into(self) -> GameState {
         Left(self)
     }
 }
-
-type GameState = Either<State<PlayerO>, State<PlayerX>>;
 
 pub fn new_game() -> GameState {
     Left(State::<PlayerO> {
